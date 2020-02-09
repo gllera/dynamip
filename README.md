@@ -27,7 +27,7 @@ TTL='150'
 ./dynamip
 ```
 
-* btw, for example, is easier if you use it as a service configured as following:
+* btw, is easier if you use it as a service configured as following:
 ```bash
 [Unit]
 Description=Updates DNS.
