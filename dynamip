@@ -1,0 +1,38 @@
+#!/bin/bash
+
+RECORDS='XXXXX.XXX *.XXXXXX.XXX YYYYYY.XXX'
+ZONEID='ZZZZZZZZZZZ'
+TTL='150'
+IP=
+
+while :
+do
+   NIP=`dig +short myip.opendns.com @resolver1.opendns.com`
+
+   if [ $? -eq 0 ] && [ "$IP" != "$NIP" ]
+   then
+      echo "Changing from '$IP' to '$NIP'"
+
+      ARR=()
+
+      for NAME in $RECORDS
+      do
+         printf -v VAL '{ "Action":"UPSERT", "ResourceRecordSet":{ "ResourceRecords":[ { "Value":"%s" } ], "Name":"%s", "Type":"A", "TTL":%s }}' "$NIP" "$NAME" "$TTL"
+         ARR+=( "$VAL" )
+      done
+
+      printf -v CMD '{ "ChangeBatch": { "Comment":"Auto updating @ %s", "Changes":[ %s ] }}' "$(date)" "$(IFS=,; echo "${ARR[*]}")"
+
+      aws route53 change-resource-record-sets --hosted-zone-id $ZONEID --cli-input-json "$CMD"
+
+      if [ $? -eq 0 ]
+      then
+         IP="$NIP"
+         echo "SUCCESS"
+      else
+         echo "FAIL"
+      fi
+   fi
+
+   sleep 5
+done
