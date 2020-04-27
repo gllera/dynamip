@@ -17,9 +17,9 @@ aws sts get-caller-identity
 
 * Fill the variables on file dynamip as needed:
 ```bash
-RECORDS='XXXXX.XXX *.XXXXXX.XXX YYYYYY.XXX'
-ZONEID='ZZZZZZZZZZZ'
-TTL='150'
+AWS_HOSTED_ZONE_ID='ZZZZZZZZZZZ'
+DNS_RECORDS='XXXXX.XXX *.XXXXXX.XXX YYYYYY.XXX'
+DNS_TTL='150'
 ```
 
 * Execute it:
