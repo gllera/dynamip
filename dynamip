@@ -1,8 +1,10 @@
 #!/bin/bash
 
-RECORDS='XXXXX.XXX *.XXXXXX.XXX YYYYYY.XXX'
-ZONEID='ZZZZZZZZZZZ'
-TTL='150'
+## Expected environment variables:
+#RECORDS='XXXXX.XXX *.XXXXXX.XXX YYYYYY.XXX'
+#ZONEID='ZZZZZZZZZZZ'
+
+TTL=${TTL:-150}
 IP=
 
 while :
