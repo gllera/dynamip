@@ -1,11 +1,13 @@
 #!/bin/bash
 
 ## Expected environment variables:
-#RECORDS='XXXXX.XXX *.XXXXXX.XXX YYYYYY.XXX'
-#ZONEID='ZZZZZZZZZZZ'
+#AWS_HOSTED_ZONE_ID='ZZZZZZZZZZZ'
+#DNS_RECORDS='XXXXX.XXX *.XXXXXX.XXX YYYYYY.XXX'
 
-TTL=${TTL:-150}
+DNS_TTL=${DNS_TTL:-150}
 IP=
+
+trap 'exit 130' INT
 
 while :
 do
@@ -17,15 +19,15 @@ do
 
       ARR=()
 
-      for NAME in $RECORDS
+      for NAME in $DNS_RECORDS
       do
-         printf -v VAL '{ "Action":"UPSERT", "ResourceRecordSet":{ "ResourceRecords":[ { "Value":"%s" } ], "Name":"%s", "Type":"A", "TTL":%s }}' "$NIP" "$NAME" "$TTL"
+         printf -v VAL '{ "Action":"UPSERT", "ResourceRecordSet":{ "ResourceRecords":[ { "Value":"%s" } ], "Name":"%s", "Type":"A", "TTL":%s }}' "$NIP" "$NAME" "$DNS_TTL"
          ARR+=( "$VAL" )
       done
 
       printf -v CMD '{ "ChangeBatch": { "Comment":"Auto updating @ %s", "Changes":[ %s ] }}' "$(date)" "$(IFS=,; echo "${ARR[*]}")"
 
-      aws route53 change-resource-record-sets --hosted-zone-id $ZONEID --cli-input-json "$CMD"
+      aws route53 change-resource-record-sets --hosted-zone-id $AWS_HOSTED_ZONE_ID --cli-input-json "$CMD"
 
       if [ $? -eq 0 ]
       then
