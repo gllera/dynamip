@@ -13,5 +13,5 @@ jobs:
     - name: Build the Docker image
       run: |
         echo ${{ secrets.TOKEN }} | docker login --username gllera --password-stdin
-        docker build --tag gllera/rsss .
-        docker push gllera/rsss
+        docker build --tag gllera/dynamip .
+        docker push gllera/dynamip
