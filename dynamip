@@ -7,7 +7,7 @@
 DNS_TTL=${DNS_TTL:-150}
 IP=
 
-trap 'exit 130' INT
+trap 'exit 0' INT SIGTERM
 
 while :
 do
