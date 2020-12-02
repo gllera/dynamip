@@ -1,41 +1,27 @@
-#!/bin/bash
+#!/bin/sh
 
-## Expected environment variables:
-#AWS_HOSTED_ZONE_ID='ZZZZZZZZZZZ'
-#DNS_RECORDS='XXXXX.XXX *.XXXXXX.XXX YYYYYY.XXX'
+trap 'exit 0' SIGINT SIGTERM
 
 DNS_TTL=${DNS_TTL:-150}
-IP=
 
-trap 'exit 0' INT SIGTERM
+while :; do
 
-while :
-do
    NIP=`dig +short myip.opendns.com @resolver1.opendns.com`
 
-   if [ $? -eq 0 ] && [ "$IP" != "$NIP" ]
-   then
+   if [ $? -eq 0 -a "$IP" != "$NIP" ]; then
+
       echo "Changing from '$IP' to '$NIP'"
+      unset VALUES
 
-      ARR=()
-
-      for NAME in $DNS_RECORDS
-      do
-         printf -v VAL '{ "Action":"UPSERT", "ResourceRecordSet":{ "ResourceRecords":[ { "Value":"%s" } ], "Name":"%s", "Type":"A", "TTL":%s }}' "$NIP" "$NAME" "$DNS_TTL"
-         ARR+=( "$VAL" )
+      for NAME in $DNS_RECORDS; do
+         VAL=`printf '{ "Action":"UPSERT", "ResourceRecordSet":{ "ResourceRecords":[ { "Value":"%s" } ], "Name":"%s", "Type":"A", "TTL":%s }}' "$NIP" "$NAME" "$DNS_TTL"`
+         VALUES="$VALUES${VALUES+,}$VAL"
       done
 
-      printf -v CMD '{ "ChangeBatch": { "Comment":"Auto updating @ %s", "Changes":[ %s ] }}' "$(date)" "$(IFS=,; echo "${ARR[*]}")"
+      JSON=`printf '{ "ChangeBatch": { "Comment":"Auto updating @ %s", "Changes":[ %s ] }}' "$(date)" "$VALUES"`
 
-      aws route53 change-resource-record-sets --hosted-zone-id $AWS_HOSTED_ZONE_ID --cli-input-json "$CMD"
-
-      if [ $? -eq 0 ]
-      then
+      aws route53 change-resource-record-sets --hosted-zone-id $AWS_HOSTED_ZONE_ID --cli-input-json "$JSON" &&
          IP="$NIP"
-         echo "SUCCESS"
-      else
-         echo "FAIL"
-      fi
    fi
 
    sleep 5
