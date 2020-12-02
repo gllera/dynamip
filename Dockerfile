@@ -1,12 +1,10 @@
-FROM amazon/aws-cli
-
-RUN yum update -y \
- && yum install -y bind-utils \
- && yum clean all
-
-ADD dynamip .
+FROM python:alpine
 
 ENV AWS_DEFAULT_OUTPUT=text
 
-ENTRYPOINT []
+RUN apk add --no-cache less groff bind-tools \
+ && pip install --no-cache-dir awscli
+
+ADD dynamip .
+
 CMD ./dynamip
