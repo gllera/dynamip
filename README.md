@@ -14,7 +14,7 @@ docker run -it --rm \
    gllera/dynamip
 ```
 
-## As service
+## Without docker
 
 **Requisites:**
 - awscli 
