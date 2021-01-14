@@ -1,8 +1,24 @@
 # dynamip
 Updates your domains on Route53 DNS to match your public IP
 
+# Usage
+
+## With docker
+```
+docker run -it --rm \
+   -e AWS_ACCESS_KEY_ID=AAAA123123BBBB31CCCC \
+   -e AWS_SECRET_ACCESS_KEY=aaaabbbbssVVVaasv2312w+3fdsdf32fewVdasAA \
+   -e ZONEID=AAAAAAABBBBB11 \
+   -e RECORDSET='*.exampleA.com exampleA.com exampleB.com' \
+   -e TTL=150 \
+   gllera/dynamip
+```
+
+## As service
+
 **Requisites:**
 - awscli 
+
 ```bash
 # Install awscli
 pip3 install awscli
@@ -11,9 +27,6 @@ aws configure
 # Test it
 aws sts get-caller-identity
 ```
-
-
-**Usage:**
 
 * Fill the variables on file dynamip as needed:
 ```bash
